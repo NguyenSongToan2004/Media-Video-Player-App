@@ -51,7 +51,7 @@ namespace MediaApp.DAL.Repositories
             _context.TbSongs.Add(song);
             _context.SaveChanges();
         }
-
+            
         public void UpdateSong(TbSong song)
         {
             _context = new();
@@ -95,6 +95,7 @@ namespace MediaApp.DAL.Repositories
                 .ToList();
             return songs;
         }
+
         public List<TbSong> GetSongByAlbum(TbAlbum album)
         {
             _context = new VideoMediaPlayerContext();

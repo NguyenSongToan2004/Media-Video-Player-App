@@ -1,0 +1,838 @@
+<Window x:Class="video_media_player.EditVideoWindow"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      xmlns:uc="clr-namespace:video_media_player.UserControls"
+      Height="700" Width="1050" Background="Transparent" AllowsTransparency="True" WindowStyle="None" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" KeyUp="Window_KeyUp" KeyDown="Window_KeyDown" PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Grid>
+                            <Border CornerRadius="5" Background="Transparent" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SpeedOptionStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#ffffff"/>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="3 0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Tag" Value="Collapsed"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#080808"/>
+                    <Setter Property="Foreground" Value="#fffafa "/>
+                    <Setter Property="Tag" Value="Visible"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="CustomScrollBar" TargetType="{x:Type ScrollBar}">
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid>
+                            <Rectangle Width="8" Fill="Transparent" RadiusX="4" RadiusY="4"/>
+                            <Track x:Name="PART_Track" IsDirectionReversed="true">
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource ScrollBarThumb}"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CustomScrollViewer" TargetType="{x:Type ScrollViewer}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                        <Grid x:Name="ScrollBarGrid">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="0"/>
+                            </Grid.ColumnDefinitions>
+                            <ScrollContentPresenter Grid.Column="0"/>
+                            <ScrollBar x:Name="PART_VerticalScrollBar"
+                                         Grid.Column="1"
+                                         Value="{TemplateBinding VerticalOffset}"
+                                         Maximum="{TemplateBinding ScrollableHeight}"
+                                         ViewportSize="{TemplateBinding ViewportHeight}"
+                                         Style="{StaticResource CustomScrollBar}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Border x:Name="MainBorder" Background="White" CornerRadius="40" MouseDown="Border_MouseDown" BorderBrush="Black" BorderThickness="2">
+        <ScrollViewer x:Name="FullScreenScrollView" Margin="30,30,30,30" Style="{StaticResource CustomScrollViewer}">
+            <Grid x:Name="FullLayOutGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Video Player Section (Left) -->
+                <Grid x:Name="PlayerScreenGrid" Grid.Row="0" Margin="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Title -->
+                    <TextBlock Style="{StaticResource titleText}" Grid.Row="0" 
+                    Margin="0,0,0,20" Text="Edit Video And Sound" Grid.Column="0" FontWeight="ExtraBold"/>
+                    <StackPanel Margin="5,10,10,20" Grid.Row="0" Grid.Column="1" VerticalAlignment="Top">
+                        <!-- Ellipses-->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="35 10 0 10" VerticalAlignment="Center">
+                            <Button Background="#ff6258" Width="10" Height="10" Click="CloseButton_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="5"/>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <Button Background="#ffbf2f" Width="10" Height="10" Margin="7 0" Click="ToggleWindowStateButton_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="5"/>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <Button Background="#2acb42" Width="10" Height="10" Click="MinimizeButton_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="5"/>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                    <!-- Video Player -->
+                    <Border x:Name="ScreenBorder"
+                        Grid.Row="1" Background="#202020" 
+                        CornerRadius="0" Margin="0,2,0,0" Grid.ColumnSpan="2" MouseEnter="ScreenBorder_MouseEnter" MouseLeave="ScreenBorder_MouseLeave" MouseMove="ScreenBorder_MouseMove" 
+                        >
+                        <StackPanel Orientation="Vertical">
+                            <Grid Height="{Binding ElementName=VideoMediaPlayer, Path=ActualHeight}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel x:Name="PreviousStackPanel" Orientation="Vertical" Grid.Row="1" Grid.Column="0" Panel.ZIndex="1" Margin="30 0 0 0" Visibility="Hidden">
+                                    <Label Content="- 10 giây" FontSize="30" FontWeight="Bold" Foreground="LightGray" Background="Transparent" HorizontalContentAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel x:Name="VolumeStackPanel" Orientation="Vertical" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Panel.ZIndex="1" Visibility="Hidden">
+                                    <Label x:Name="VolumePressUpLabel" Content="Volume" FontSize="30" FontWeight="Bold" Foreground="LightGray" Background="Transparent"/>
+                                    <Icon:PackIconMaterial Kind="VolumeSource" Background="Transparent" Foreground="LightGray" HorizontalContentAlignment="Center" FontSize="30" FontWeight="Bold" Margin="20 0 0 0"/>
+                                </StackPanel>
+                                <StackPanel x:Name="ForwardStackPanel" Orientation="Vertical" Grid.Row="1" Grid.Column="2" Panel.ZIndex="1" Margin="0 0 30 0" Visibility="Hidden">
+                                    <Label Content="+ 10 giây" FontSize="30" FontWeight="Bold" Foreground="LightGray" Background="Transparent" HorizontalContentAlignment="Center"/>
+                                </StackPanel>
+                                <MediaElement VerticalAlignment="Top" x:Name="VideoMediaPlayer"
+                                            LoadedBehavior="Manual"
+                                            UnloadedBehavior="Stop"
+                                            Stretch="Uniform" 
+                                            Margin="0,-1,0,0" 
+                                            MouseLeftButtonUp="VideoMediaPlayer_MouseLeftButtonUp" 
+                                            Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
+                                            Volume="0.5"
+                                            ScrubbingEnabled="True"
+                                            MediaOpened="VideoMediaPlayer_MediaOpened"
+                                            MediaFailed="VideoMediaPlayer_MediaFailed"/>
+                                <Grid VerticalAlignment="Bottom" x:Name="TaskBarGrid" Visibility="Visible" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+                                    <Grid.RowDefinitions >
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Slider x:Name="TimeSlider" Grid.Row="0" Style="{DynamicResource SliderStyle1}" PreviewMouseDown="TimeSlider_PreviewMouseDown" PreviewMouseUp="TimeSlider_PreviewMouseUp" Cursor="Hand"/>
+                                    <StackPanel Grid.Row="1">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                                <Button x:Name="PlayButton" Style="{StaticResource playButton}" Click="PlayButton_Click" Cursor="Hand">
+                                                    <Icon:PackIconMaterial x:Name="PlayIcon" Kind="Pause" Style="{StaticResource playerButtonIcon}" Cursor="Hand"/>
+                                                </Button>
+                                                <StackPanel Grid.Column="0">
+                                                    <Button Style="{StaticResource playButton}" x:Name="volumeButton" HorizontalAlignment="Left" Click="volumeButton_Click" Cursor="Hand">
+                                                        <Icon:PackIconMaterial x:Name="VolumeIcon" Kind="VolumeMedium" Style="{StaticResource playerButtonIcon}" />
+                                                    </Button>
+                                                    <Popup x:Name="volumePopup" Placement="Custom" PlacementTarget="{Binding ElementName=volumeButton}" StaysOpen="False" AllowsTransparency="True" >
+                                                        <Border Background="Black" BorderBrush="Transparent" CornerRadius="8" Padding="5">
+                                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                                <Slider x:Name="VolumeSlider" 
+                                                                    Style="{StaticResource VerticalSliderStyle}" 
+                                                                    IsSelectionRangeEnabled="True" 
+                                                                    HorizontalAlignment="Center" 
+                                                                    Height="150" 
+                                                                    Minimum="0" 
+                                                                    Value="50"
+                                                                    Maximum="100" 
+                                                                    TickFrequency="1" 
+                                                                    ValueChanged="VolumeSlider_ValueChanged" />
+                                                            </StackPanel>
+                                                        </Border>
+                                                    </Popup>
+                                                </StackPanel>
+
+                                                <Label x:Name="TimeLabel" Content="Time" Background="Transparent" Foreground="White" FontSize="20"/>
+                                                <Label x:Name="MaxTimeLabel" Content="/ Max Time" Background="Transparent" Foreground="White" FontSize="20"/>
+                                            </StackPanel>
+                                            <Grid Grid.Column="1" HorizontalAlignment="Right">
+                                                <Button x:Name="SpeedButton" Style="{StaticResource playButton}" Click="SpeedButton_Click" Cursor="Hand">
+                                                    <Icon:PackIconMaterial Kind="PlaySpeed" Style="{StaticResource playerButtonIcon}"/>
+                                                </Button>
+
+                                                <Popup x:Name="SpeedPopup" Placement="Top" PlacementTarget="{Binding ElementName=SpeedButton}"                              StaysOpen="False" AllowsTransparency="True" >
+                                                    <Border Background="#3b3c36" BorderBrush="Transparent" CornerRadius="8" Padding="2">
+                                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                                            <Button x:Name="SpeedX2Button" Content="2" Margin="2" Style="{StaticResource SpeedOptionStyle}" Click="SpeedX2Button_Click" Cursor="Hand"/>
+                                                            <Button x:Name="SpeedX175Button" Content="1.75" Margin="2" Style="{StaticResource SpeedOptionStyle}" Click="SpeedX175Button_Click" Cursor="Hand"/>
+                                                            <Button x:Name="SpeedX15Button" Content="1.5" Margin="2" Style="{StaticResource SpeedOptionStyle}" Click="SpeedX15Button_Click" Cursor="Hand"/>
+                                                            <Button x:Name="SpeedX1Button" Content="1" Margin="2" Style="{StaticResource SpeedOptionStyle}" Click="SpeedX1Button_Click" Cursor="Hand"/>
+                                                            <Button x:Name="SpeedX05Button" Content="0.5" Margin="2" Style="{StaticResource SpeedOptionStyle}" Click="SpeedX05Button_Click" Cursor="Hand"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Popup>
+                                            </Grid>
+
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2">
+                                                <Button x:Name="ZoomButton" Style="{StaticResource playButton}" Margin="0 0 10 0" Cursor="Hand" Click="ZoomButton_Click">
+                                                    <Icon:PackIconMaterial Kind="Fullscreen" Style="{StaticResource playerButtonIcon}"/>
+                                                </Button>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <Label x:Name="VideoNameLabel" Content="" FontSize="25" Background="Transparent" Foreground="Black" FontWeight="Bold" Grid.Row="1"/>
+                <!-- Playlist Section (Right) -->
+                <Border Grid.Row="2" 
+             CornerRadius="20" 
+             Margin="0,30,0,30">
+
+                    <Border.Effect>
+                        <DropShadowEffect Color="#1fae7e" 
+                             Direction="320" 
+                             ShadowDepth="0" 
+                             BlurRadius="20" 
+                             Opacity="0.4"/>
+                    </Border.Effect>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Playlist Header -->
+                        <StackPanel Margin="30,30,30,0">
+                            <TextBlock Text="MP4 Video Player" 
+                          Foreground="Black" 
+                          FontSize="26" 
+                          FontWeight="Bold"/>
+                        </StackPanel>
+                        <!--<StackPanel Grid.Row="1" x:Name="ListVideos">
+                        </StackPanel>-->
+
+                        <StackPanel Grid.Row="1">
+                            <!-- File Selection -->
+                            <StackPanel>
+                                <TextBlock Text="MP4 Video File:" 
+                                       FontWeight="SemiBold"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="33*"/>
+                                        <ColumnDefinition Width="415*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="txtFilePath" 
+                                            Height="30"
+                                            Padding="5"
+                                            IsReadOnly="True" Grid.ColumnSpan="2" />
+                                    <Button x:Name="ImportFileButton" Grid.Column="2"
+                                            Content="Browse" 
+                                            Width="80"
+                                            Height="NaN"
+                                            Margin="10,0,0,0" Click="ImportFileButton_Click"
+                                    />
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Logo Selection -->
+                            <StackPanel Margin="0,20,0,0">
+                                <TextBlock Text="Logo cho Video:" 
+                                           FontWeight="SemiBold"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="33*"/>
+                                        <ColumnDefinition Width="415*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="txtLogoPath" 
+                                            Height="30"
+                                            Padding="5"
+                                            IsReadOnly="True" Grid.ColumnSpan="2" 
+                                            Text="Chưa chọn logo"/>
+                                    <Button x:Name="ImportLogoButton" Grid.Column="2"
+                                        Content="Chọn Logo" 
+                                        Width="100"
+                                        Height="NaN"
+                                        Margin="10,0,0,0" Click="ImportLogoButton_Click"
+                                    />
+                                </Grid>
+
+                                <!-- Logo Preview -->
+                                <Border x:Name="LogoPreviewBorder" 
+                                        Margin="0,10,0,0" 
+                                        Height="80" 
+                                        Background="LightGray" 
+                                        CornerRadius="5"
+                                        Visibility="Hidden">
+                                    <Image x:Name="LogoPreviewImage" 
+                                           Stretch="Uniform" 
+                                           HorizontalAlignment="Center" 
+                                           VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- Logo Controls -->
+                                <StackPanel Margin="0,15,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Text="Vị trí:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <ComboBox x:Name="LogoPositionComboBox" Grid.Column="1" Grid.Row="0"
+                                                  Width="150" Margin="0,0,20,0" SelectedIndex="0">
+                                            <ComboBoxItem Content="Góc trên bên trái"/>
+                                            <ComboBoxItem Content="Góc trên bên phải"/>
+                                            <ComboBoxItem Content="Góc dưới bên trái"/>
+                                            <ComboBoxItem Content="Góc dưới bên phải"/>
+                                            <ComboBoxItem Content="Giữa"/>
+                                        </ComboBox>
+
+                                        <TextBlock Text="Kích thước:" Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="3" Grid.Row="0" Orientation="Horizontal">
+                                            <Slider x:Name="LogoSizeSlider" 
+                                                    Width="100" 
+                                                    Minimum="0.1" 
+                                                    Maximum="1.0" 
+                                                    Value="0.3" 
+                                                    TickFrequency="0.1"
+                                                    IsSnapToTickEnabled="True"
+                                                    ValueChanged="LogoSizeSlider_ValueChanged"/>
+                                            <TextBlock x:Name="LogoSizeLabel" 
+                                                       Text="30%" 
+                                                       VerticalAlignment="Center" 
+                                                       Margin="10,0,0,0" 
+                                                       MinWidth="40"/>
+                                        </StackPanel>
+
+                                        <TextBlock Text="Độ trong suốt:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="0,10,10,0"/>
+                                        <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,0">
+                                            <Slider x:Name="LogoOpacitySlider" 
+                                                    Width="100" 
+                                                    Minimum="0.1" 
+                                                    Maximum="1.0" 
+                                                    Value="0.8" 
+                                                    TickFrequency="0.1"
+                                                    IsSnapToTickEnabled="True"
+                                                    ValueChanged="LogoOpacitySlider_ValueChanged"/>
+                                            <TextBlock x:Name="LogoOpacityLabel" 
+                                                       Text="80%" 
+                                                       VerticalAlignment="Center" 
+                                                       Margin="10,0,0,0" 
+                                                       MinWidth="40"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Apply Logo Button -->
+                                <Button x:Name="ApplyLogoButton" 
+                                        Content="Áp dụng Logo vào Video" 
+                                        Height="35" 
+                                        Margin="0,15,0,0"
+                                        Background="#1fae7e"
+                                        Foreground="White"
+                                        FontWeight="Bold"
+                                        Click="ApplyLogoButton_Click"/>
+                            </StackPanel>
+
+                            <!-- Audio Selection -->
+                            <StackPanel Margin="0,20,0,0">
+                                <TextBlock Text="Audio để gắn vào Video:" 
+                                         FontWeight="SemiBold"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="33*"/>
+                                        <ColumnDefinition Width="415*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="txtAudioPath" 
+                                                 Height="30"
+                                                 Padding="5"
+                                                 IsReadOnly="True" Grid.ColumnSpan="2" 
+                                                 Text="Chưa chọn file audio"/>
+                                    <Button x:Name="ImportAudioButton" Grid.Column="2"
+                                                     Content="Chọn Audio" 
+                                                     Width="100"
+                                                     Height="NaN"
+                                                     Margin="10,0,0,0" Click="ImportAudioButton_Click"
+                                             />
+                                </Grid>
+
+                                <!-- Audio Controls -->
+                                <StackPanel Margin="0,15,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Text="Âm lượng:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal">
+                                            <Slider x:Name="AudioVolumeSlider" 
+                                                     Width="100" 
+                                                     Minimum="0.0" 
+                                                     Maximum="2.0" 
+                                                     Value="1.0" 
+                                                     TickFrequency="0.1"
+                                                     IsSnapToTickEnabled="True"
+                                                     ValueChanged="AudioVolumeSlider_ValueChanged"/>
+                                            <TextBlock x:Name="AudioVolumeLabel" 
+                                                        Text="100%" 
+                                                        VerticalAlignment="Center" 
+                                                        Margin="10,0,0,0" 
+                                                        MinWidth="40"/>
+                                        </StackPanel>
+
+                                        <TextBlock Text="Đồng bộ:" Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="3" Grid.Row="0" Orientation="Horizontal">
+                                            <Slider x:Name="AudioSyncSlider" 
+                                                     Width="100" 
+                                                     Minimum="-10.0" 
+                                                     Maximum="10.0" 
+                                                     Value="0.0" 
+                                                     TickFrequency="0.5"
+                                                     IsSnapToTickEnabled="True"
+                                                     ValueChanged="AudioSyncSlider_ValueChanged"/>
+                                            <TextBlock x:Name="AudioSyncLabel" 
+                                                        Text="0.0s" 
+                                                        VerticalAlignment="Center" 
+                                                        Margin="10,0,0,0" 
+                                                        MinWidth="40"/>
+                                        </StackPanel>
+
+                                        <TextBlock Text="Chế độ:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="0,10,10,0"/>
+                                        <!-- 
+                                        Default: Mặc định theo đúng thời gian
+                                        Loop: Vòng lặp cho tới khi hết video
+                                        Trim Video: Cắt video cho phù hợp với thời gian của âm thanh
+                                        -->
+                                        <ComboBox x:Name="AudioModeComboBox" Grid.Column="1" Grid.Row="1" 
+                                                   Width="150" Margin="0,10,20,0" SelectedIndex="0">
+                                            <ComboBoxItem Content="Default" Tag="default"/>
+                                            <ComboBoxItem Content="Loop" Tag="loop"/>
+                                            <ComboBoxItem Content="Trim Video" Tag="trim"/>
+                                        </ComboBox>
+
+                                        <TextBlock Text="Fade:" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" Margin="0,10,10,0"/>
+                                        <StackPanel Grid.Column="3" Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,0">
+                                            <Slider x:Name="AudioFadeSlider" 
+                                                     Width="100" 
+                                                     Minimum="0.0" 
+                                                     Maximum="5.0" 
+                                                     Value="0.0" 
+                                                     TickFrequency="0.5"
+                                                     IsSnapToTickEnabled="True"
+                                                     ValueChanged="AudioFadeSlider_ValueChanged"/>
+                                            <TextBlock x:Name="AudioFadeLabel" 
+                                                        Text="0.0s" 
+                                                        VerticalAlignment="Center" 
+                                                        Margin="10,0,0,0" 
+                                                        MinWidth="40"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Apply Audio Button -->
+                                <Button x:Name="ApplyAudioButton" 
+                                        Content="Áp dụng Audio vào Video" 
+                                        Height="35" 
+                                        Margin="0,15,0,0"
+                                        Background="#ff6b35"
+                                        Foreground="White"
+                                        FontWeight="Bold"
+                                        Click="ApplyAudioButton_Click"/>
+
+                                <!-- Export Video Button -->
+                                <Button x:Name="ExportVideoButton" 
+                                        Content="Xuất Video" 
+                                        Height="40" 
+                                        Margin="0,20,0,0"
+                                        Background="#9c27b0"
+                                        Foreground="White"
+                                        FontWeight="Bold"
+                                        FontSize="16"
+                                        Click="ExportVideoButton_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <!-- Export Video Popup -->
+                        <Popup x:Name="ExportPopup" 
+                                   Placement="AbsolutePoint" 
+                                   StaysOpen="False" 
+                                   AllowsTransparency="True"
+                                   IsOpen="False"
+                                   PopupAnimation="Fade"
+                                   MouseDown="ExportPopup_MouseDown">
+                            <Border Background="White" 
+                                     BorderBrush="#9c27b0" 
+                                     BorderThickness="2" 
+                                     CornerRadius="15" 
+                                     Padding="20"
+                                     Width="500">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#9c27b0" 
+                              Direction="320" 
+                              ShadowDepth="5" 
+                              BlurRadius="20" 
+                              Opacity="0.3"/>
+                                </Border.Effect>
+
+                                <StackPanel>
+                                    <!-- Header with Close Button -->
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Text="Xuất Video" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="#9c27b0" 
+                               HorizontalAlignment="Center" 
+                               Grid.Column="0"
+                               Margin="0,0,0,20"/>
+
+                                        <!-- Close Button (X) -->
+                                        <Button x:Name="CloseExportPopupButton" 
+                            Grid.Column="1"
+                            Content="✕" 
+                            Width="30" 
+                            Height="30" 
+                            Background="Transparent" 
+                            Foreground="#9c27b0" 
+                            FontSize="18" 
+                            FontWeight="Bold"
+                            BorderThickness="0"
+                            Click="CloseExportPopupButton_Click"
+                            Cursor="Hand">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" 
+                                        CornerRadius="15">
+                                                        <ContentPresenter HorizontalAlignment="Center" 
+                                                    VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="#ffebee"/>
+                                                            <Setter Property="Foreground" Value="#d32f2f"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </Grid>
+
+                                    <!-- Format Selection -->
+                                    <StackPanel Margin="0,0,0,15">
+                                        <TextBlock Text="Định dạng:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <ComboBox x:Name="ExportFormatComboBox" 
+                           Width="200" 
+                           HorizontalAlignment="Left" 
+                           SelectedIndex="0">
+                                            <ComboBoxItem Content="MP4 (H.264)" Tag="mp4"/>
+                                            <ComboBoxItem Content="MKV (Matroska)" Tag="mkv"/>
+                                            <ComboBoxItem Content="AVI (Audio Video Interleave)" Tag="avi"/>
+                                            <ComboBoxItem Content="MOV (QuickTime)" Tag="mov"/>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <!-- Quality Selection -->
+                                    <StackPanel Margin="0,0,0,15">
+                                        <TextBlock Text="Chất lượng:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <ComboBox x:Name="ExportQualityComboBox" 
+                           Width="200" 
+                           HorizontalAlignment="Left" 
+                           SelectedIndex="2"
+                           SelectionChanged="ExportQualityComboBox_SelectionChanged">
+                                            <ComboBoxItem Content="Thấp (480p)" Tag="480"/>
+                                            <ComboBoxItem Content="Trung bình (720p)" Tag="720"/>
+                                            <ComboBoxItem Content="Cao (1080p)" Tag="1080"/>
+                                            <ComboBoxItem Content="Ultra HD (4K)" Tag="4k"/>
+                                            <ComboBoxItem Content="Tùy chỉnh" Tag="custom"/>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <!-- Custom Quality Settings -->
+                                    <StackPanel x:Name="CustomQualityPanel" Margin="0,0,0,15" Visibility="Collapsed">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock Text="Độ phân giải:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal">
+                                                <TextBox x:Name="CustomWidthTextBox" Width="60" Text="1920" Margin="0,0,5,0"/>
+                                                <TextBlock Text="x" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                <TextBox x:Name="CustomHeightTextBox" Width="60" Text="1080"/>
+                                            </StackPanel>
+
+                                            <TextBlock Text="Bitrate:" Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <StackPanel Grid.Column="3" Grid.Row="0" Orientation="Horizontal">
+                                                <TextBox x:Name="CustomBitrateTextBox" Width="80" Text="8000"/>
+                                                <TextBlock Text="kbps" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                            </StackPanel>
+
+                                            <TextBlock Text="FPS:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Margin="0,10,10,0"/>
+                                            <ComboBox x:Name="CustomFPSComboBox" Grid.Column="1" Grid.Row="1" Width="80" SelectedIndex="2">
+                                                <ComboBoxItem Content="24"/>
+                                                <ComboBoxItem Content="25"/>
+                                                <ComboBoxItem Content="30"/>
+                                                <ComboBoxItem Content="50"/>
+                                                <ComboBoxItem Content="60"/>
+                                            </ComboBox>
+
+                                            <TextBlock Text="Codec:" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" Margin="0,10,10,0"/>
+                                            <ComboBox x:Name="CustomCodecComboBox" Grid.Column="3" Grid.Row="1" Width="120" SelectedIndex="0">
+                                                <ComboBoxItem Content="H.264"/>
+                                                <ComboBoxItem Content="H.265 (HEVC)"/>
+                                                <ComboBoxItem Content="VP9"/>
+                                                <ComboBoxItem Content="AV1"/>
+                                            </ComboBox>
+                                        </Grid>
+                                    </StackPanel>
+
+                                    <!-- Applied Logo Information -->
+                                    <StackPanel Margin="0,0,0,15">
+                                        <TextBlock Text="Logo đã áp dụng:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <Border Background="#f0f8ff" BorderBrush="#87ceeb" BorderThickness="1" CornerRadius="5" Padding="10">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Text="File:" Grid.Column="0" Grid.Row="0" FontWeight="SemiBold" Margin="0,0,10,0"/>
+                                                <TextBlock x:Name="ExportLogoFileText" Grid.Column="1" Grid.Row="0" Text="Chưa áp dụng logo" Foreground="#666"/>
+
+                                                <TextBlock Text="Vị trí:" Grid.Column="0" Grid.Row="1" FontWeight="SemiBold" Margin="0,0,10,0"/>
+                                                <TextBlock x:Name="ExportLogoPositionText" Grid.Column="1" Grid.Row="1" Text="-" Foreground="#666"/>
+
+                                                <TextBlock Text="Kích thước:" Grid.Column="0" Grid.Row="2" FontWeight="SemiBold" Margin="0,0,10,0"/>
+                                                <TextBlock x:Name="ExportLogoSizeText" Grid.Column="1" Grid.Row="2" Text="-" Foreground="#666"/>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <!-- Applied Audio Information -->
+                                    <StackPanel Margin="0,0,0,15">
+                                        <TextBlock Text="Audio đã áp dụng:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <Border Background="#fff0f5" BorderBrush="#ffb6c1" BorderThickness="1" CornerRadius="5" Padding="10">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Text="File:" Grid.Column="0" Grid.Row="0" FontWeight="SemiBold" Margin="0,0,10,0"/>
+                                                <TextBlock x:Name="ExportAudioFileText" Grid.Column="1" Grid.Row="0" Text="Chưa áp dụng audio" Foreground="#666"/>
+
+                                                <TextBlock Text="Chế độ:" Grid.Column="0" Grid.Row="1" FontWeight="SemiBold" Margin="0,0,10,0"/>
+                                                <TextBlock x:Name="ExportAudioModeText" Grid.Column="1" Grid.Row="1" Text="-" Foreground="#666"/>
+
+                                                <TextBlock Text="Âm lượng:" Grid.Column="0" Grid.Row="2" FontWeight="SemiBold" Margin="0,0,10,0"/>
+                                                <TextBlock x:Name="ExportAudioVolumeText" Grid.Column="1" Grid.Row="2" Text="-" Foreground="#666"/>
+
+                                                <TextBlock Text="Đồng bộ:" Grid.Column="0" Grid.Row="3" FontWeight="SemiBold" Margin="0,0,10,0"/>
+                                                <TextBlock x:Name="ExportAudioSyncText" Grid.Column="1" Grid.Row="3" Text="-" Foreground="#666"/>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <!-- Audio Settings -->
+                                    <StackPanel Margin="0,0,0,15">
+                                        <TextBlock Text="Cài đặt Audio xuất:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="Codec:" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <ComboBox x:Name="AudioCodecComboBox" Grid.Column="1" Width="120" SelectedIndex="0">
+                                                <ComboBoxItem Content="AAC"/>
+                                                <ComboBoxItem Content="MP3"/>
+                                                <ComboBoxItem Content="AC3"/>
+                                                <ComboBoxItem Content="PCM"/>
+                                            </ComboBox>
+
+                                            <TextBlock Text="Bitrate:" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <ComboBox x:Name="AudioBitrateComboBox" Grid.Column="3" Width="100" SelectedIndex="1">
+                                                <ComboBoxItem Content="128 kbps"/>
+                                                <ComboBoxItem Content="256 kbps"/>
+                                                <ComboBoxItem Content="320 kbps"/>
+                                                <ComboBoxItem Content="512 kbps"/>
+                                            </ComboBox>
+                                        </Grid>
+                                    </StackPanel>
+
+                                    <!-- Output Settings -->
+                                    <StackPanel Margin="0,0,0,20">
+                                        <TextBlock Text="Thư mục xuất:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox x:Name="ExportPathTextBox" 
+                                                      Height="30" 
+                                                      Padding="5" 
+                                                      IsReadOnly="True" 
+                                                      Text="Chưa chọn thư mục"/>
+                                            <Button x:Name="BrowseExportPathButton" 
+                                                     Grid.Column="1" 
+                                                     Content="Browse" 
+                                                     Width="80" 
+                                                     Height="30" 
+                                                     Margin="10,0,0,0" 
+                                                     Click="BrowseExportPathButton_Click"/>
+                                        </Grid>
+                                    </StackPanel>
+
+                                    <!-- Progress Bar -->
+                                    <StackPanel x:Name="ExportProgressPanel" Margin="0,0,0,15" Visibility="Collapsed">
+                                        <TextBlock Text="Đang xuất video..." FontWeight="SemiBold"              Margin="0,0,0,5"/>
+                                        <ProgressBar x:Name="ExportProgressBar" 
+                                                      Height="20" 
+                                                      Minimum="0" 
+                                                      Maximum="100" 
+                                                      Value="0"/>
+                                        <TextBlock x:Name="ExportProgressText" 
+                                                    Text="0%" 
+                                                    HorizontalAlignment="Center" 
+                                                    Margin="0,5,0,0"/>
+                                    </StackPanel>
+
+                                    <!-- Action Buttons -->
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button x:Name="StartExportButton" 
+                                                 Content="Bắt đầu Xuất" 
+                                                 Width="120" 
+                                                 Height="35" 
+                                                 Background="#9c27b0" 
+                                                 Foreground="White" 
+                                                 FontWeight="Bold" 
+                                                 Margin="0,0,10,0" 
+                                                 Click="StartExportButton_Click"/>
+                                        <Button x:Name="CancelExportButton" 
+                                                 Content="Hủy" 
+                                                 Width="80" 
+                                                 Height="35" 
+                                                 Background="Gray" 
+                                                 Foreground="White" 
+                                                 FontWeight="Bold" 
+                                                 Click="CancelExportButton_Click"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Border>
+
+
+</Window> 

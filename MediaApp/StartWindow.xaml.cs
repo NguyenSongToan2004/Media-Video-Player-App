@@ -39,8 +39,10 @@ namespace MediaApp
         private void MP4_Click(object sender, RoutedEventArgs e)
         {
             this.Hide();
-            MusicVideosPage musicVideosPage = new();
-            musicVideosPage.ShowDialog();
+            //MusicVideosPage musicVideosPage = new();
+            //musicVideosPage.ShowDialog();
+            EditVideoWindow mainWindow = new EditVideoWindow();
+            mainWindow.ShowDialog();
             this.Show();
         }
 

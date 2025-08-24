@@ -52,24 +52,24 @@ namespace MediaApp
         {
             _cloudinary = new Cloudinary(new Account("dpfj7qsae", "464938966635639", "U4sYEHIN4mLuQ4abxneX08e49qs"));
         }
-        private string UploadFileToCloudinary(string filePath, string songName)
-        {
-            var uploadParams = new VideoUploadParams()
-            {
-                File = new FileDescription(filePath),
-                PublicId = songName.Trim(),
-                EagerTransforms = new List<Transformation>()
-                {
-                new EagerTransformation().Width(300).Height(300).Crop("pad").AudioCodec("none"),
-                new EagerTransformation().Width(160).Height(100).Crop("crop").Gravity("south").AudioCodec("none"),
-                },
-                EagerAsync = true,
-                EagerNotificationUrl = "https://mysite.example.com/my_notification_endpoint"
-            };
-            var uploadResult = _cloudinary.Upload(uploadParams);
-            string fileUrl = uploadResult.Url.ToString();
-            return fileUrl;
-        }
+        //private string UploadFileToCloudinary(string filePath, string songName)
+        //{
+        //    var uploadParams = new VideoUploadParams()
+        //    {
+        //        File = new FileDescription(filePath),
+        //        PublicId = songName.Trim(),
+        //        EagerTransforms = new List<Transformation>()
+        //        {
+        //        new EagerTransformation().Width(300).Height(300).Crop("pad").AudioCodec("none"),
+        //        new EagerTransformation().Width(160).Height(100).Crop("crop").Gravity("south").AudioCodec("none"),
+        //        },
+        //        EagerAsync = true,
+        //        EagerNotificationUrl = "https://mysite.example.com/my_notification_endpoint"
+        //    };
+        //    var uploadResult = _cloudinary.Upload(uploadParams);
+        //    string fileUrl = uploadResult.Url.ToString();
+        //    return fileUrl;
+        //}
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtSongName.Text))
@@ -91,12 +91,12 @@ namespace MediaApp
 
             if (EditSong == null)
             {
-                song.FilePath = UploadFileToCloudinary(txtFilePath.Text, txtSongName.Text);
+                //song.FilePath = UploadFileToCloudinary(txtFilePath.Text, txtSongName.Text);
                 _service.Create(song);
             }
             else
             {
-                song.FilePath = UploadFileToCloudinary(txtFilePath.Text, txtSongName.Text);
+                //song.FilePath = UploadFileToCloudinary(txtFilePath.Text, txtSongName.Text);
                 _service.Update(song);
             }
 
@@ -138,6 +138,7 @@ namespace MediaApp
             }
 
         }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             ArtistCombobox.ItemsSource = _artistService.GetAll();

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:local="clr-namespace:video_media_player"
-             StartupUri="LoginPage.xaml">
+             StartupUri="StartWindow.xaml">
     <Application.Resources>
 
         <Style x:Key="PlaylistsListItem" TargetType="{x:Type ListBoxItem}">
